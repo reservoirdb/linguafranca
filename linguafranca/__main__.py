@@ -7,6 +7,7 @@ import shutil
 from collections import defaultdict
 from pathlib import Path
 import subprocess
+import sys
 
 from .lang import Lang
 from .lang_rust import RustLang
@@ -14,6 +15,7 @@ from .lang_rust import RustLang
 def get_all_exported_types(module: ModuleType) -> list[type]:
 	return [obj for obj in module.__dict__.values() if isinstance(obj, type) and obj.__module__ == module.__name__]
 
+types = get_all_exported_types(importlib.import_module('.types', package = __package__))
 commands = get_all_exported_types(importlib.import_module('.commands', package = __package__))
 
 def process_lang(lang_name: str) -> None:
@@ -26,17 +28,22 @@ def process_lang(lang_name: str) -> None:
 	lang = lang_types[0]()
 	assert isinstance(lang, Lang)
 
-	command_files: dict[Path, list[str]] = defaultdict(list)
+	output_files: dict[Path, list[str]] = defaultdict(list)
 	for command in commands:
-		command_files[lang_dir / lang.command_file(command)].append(textwrap.dedent(lang.gen_command(command)))
+		output_files[lang_dir / lang.command_file(command)].append(textwrap.dedent(lang.gen_command(command)))
 
-	for folder in set([p.parent for p in command_files.keys()]):
+	for t in types:
+		output_files[lang_dir / lang.type_file(command)].append(textwrap.dedent(lang.gen_type(t)))
+
+	for folder in set([p.parent for p in output_files.keys()]):
 		os.makedirs(folder, exist_ok = True)
 
-	for path, contents in command_files.items():
+	for path, contents in output_files.items():
 		path.write_text('\n'.join(contents))
 
 	for args in lang.post_build():
 		subprocess.run(args, cwd = lang_dir, check = True)
 
-process_lang('rust')
+target_langs = sys.argv[1:]
+for lang in target_langs:
+	process_lang(lang)

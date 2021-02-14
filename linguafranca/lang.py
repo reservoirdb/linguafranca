@@ -2,11 +2,12 @@ from abc import ABC, abstractmethod
 from pathlib import Path
 
 class Lang(ABC):
-	def command_name(self, command_type: type) -> str:
-		return command_type.__name__
-
 	@abstractmethod
 	def command_file(self, command_type: type) -> Path:
+		...
+
+	@abstractmethod
+	def type_file(self, type_type: type) -> Path:
 		...
 
 	@abstractmethod
