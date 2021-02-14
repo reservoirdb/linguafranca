@@ -1,8 +1,6 @@
-from typing import cast
 from types import ModuleType
 import importlib
 import textwrap
-import os
 import shutil
 from collections import defaultdict
 from pathlib import Path
@@ -12,11 +10,12 @@ import sys
 from .lang import Lang
 from .lang_rust import RustLang
 
-def get_all_exported_types(module: ModuleType) -> list[type]:
+def get_exported_types(module_name: str) -> list[type]:
+	module = importlib.import_module(module_name, package = __package__)
 	return [obj for obj in module.__dict__.values() if isinstance(obj, type) and obj.__module__ == module.__name__]
 
-types = get_all_exported_types(importlib.import_module('.types', package = __package__))
-commands = get_all_exported_types(importlib.import_module('.commands', package = __package__))
+types = get_exported_types('.types')
+commands = get_exported_types('.commands')
 
 def process_lang(lang_name: str) -> None:
 	lang_dir = Path('out', lang_name)
@@ -24,7 +23,7 @@ def process_lang(lang_name: str) -> None:
 	lang_dir.mkdir(parents = True)
 	shutil.copytree(Path('static', lang_name), lang_dir, dirs_exist_ok = True)
 
-	lang_types = get_all_exported_types(importlib.import_module(f'.lang_{lang_name}', package = __package__))
+	lang_types = get_exported_types(f'.lang_{lang_name}')
 	lang = lang_types[0]()
 	assert isinstance(lang, Lang)
 
@@ -36,7 +35,7 @@ def process_lang(lang_name: str) -> None:
 		output_files[lang_dir / lang.type_file(command)].append(textwrap.dedent(lang.gen_type(t)))
 
 	for folder in set([p.parent for p in output_files.keys()]):
-		os.makedirs(folder, exist_ok = True)
+		folder.mkdir(exist_ok = True)
 
 	for path, contents in output_files.items():
 		path.write_text('\n'.join(contents))
