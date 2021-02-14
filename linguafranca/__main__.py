@@ -1,4 +1,5 @@
 from types import ModuleType
+from typing import TypeVar
 import importlib
 import textwrap
 import shutil
@@ -10,12 +11,17 @@ import sys
 from .lang import Lang
 from .lang_rust import RustLang
 
-def get_exported_types(module_name: str) -> list[type]:
-	module = importlib.import_module(module_name, package = __package__)
-	return [obj for obj in module.__dict__.values() if isinstance(obj, type) and obj.__module__ == module.__name__]
+T = TypeVar('T', covariant = True)
 
-types = get_exported_types('.types')
-commands = get_exported_types('.commands')
+def get_exported_types(export_type: type[T], module_name: str) -> list[type[T]]:
+	module = importlib.import_module(module_name, package = __package__)
+	return [
+		obj for obj in module.__dict__.values()
+		if isinstance(obj, type) and obj.__module__ == module.__name__ and issubclass(obj, export_type)
+	]
+
+types = get_exported_types(object, '.types')
+commands = get_exported_types(object, '.commands')
 
 def process_lang(lang_name: str) -> None:
 	lang_dir = Path('out', lang_name)
@@ -23,9 +29,8 @@ def process_lang(lang_name: str) -> None:
 	lang_dir.mkdir(parents = True)
 	shutil.copytree(Path('static', lang_name), lang_dir, dirs_exist_ok = True)
 
-	lang_types = get_exported_types(f'.lang_{lang_name}')
+	lang_types = get_exported_types(Lang, f'.lang_{lang_name}') # type: ignore
 	lang = lang_types[0]()
-	assert isinstance(lang, Lang)
 
 	output_files: dict[Path, list[str]] = defaultdict(list)
 	for command in commands:
