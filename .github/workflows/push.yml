@@ -59,6 +59,7 @@ jobs:
           for lang in ${langs[@]}
           do
             pushd out/$lang
+            git add --all
             git commit \
               -m "Deploy: ${{ github.event.head_commit.message }}"\
               -m "Source: reservoirdb/linguafranca@${{ github.sha }}"\
