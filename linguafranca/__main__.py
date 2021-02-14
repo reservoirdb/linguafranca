@@ -27,11 +27,7 @@ commands = get_exported_types(object, '.commands')
 def process_lang(lang_name: str, clean: bool, out_dir: str) -> None:
 	lang_dir = Path(out_dir, lang_name)
 	if clean:
-		for sub in lang_dir.iterdir():
-			if sub.is_file():
-				sub.unlink()
-			elif sub.is_dir() and sub != Path('.git'):
-				shutil.rmtree(sub)
+		shutil.rmtree(lang_dir)
 
 	lang_dir.mkdir(parents = True, exist_ok = True)
 	shutil.copytree(Path('static', lang_name), lang_dir, dirs_exist_ok = True)

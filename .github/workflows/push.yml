@@ -47,18 +47,19 @@ jobs:
 
           langs=(rust)
 
-          outdir=$(mktemp -d)
+          gittempdir=$(mktemp -d)
 
           for lang in ${langs[@]}
           do
-            git clone git@github.com:reservoirdb/reservoirdb-protocol-$lang.git $outdir/$lang
+            git clone git@github.com:reservoirdb/reservoirdb-protocol-$lang.git $gittempdir/$lang
           done
 
-          poetry run python -m linguafranca --outdir $outdir --clean ${langs[@]}
+          poetry run python -m linguafranca ${langs[@]}
 
           for lang in ${langs[@]}
           do
-            pushd $outdir/$lang
+            cp -a out/$lang/. $gittempdir/$lang
+            pushd $gittempdir/$lang
             git status
             git add --all
             git commit \
@@ -68,4 +69,3 @@ jobs:
             git push
             popd
           done
-
