@@ -7,6 +7,7 @@ from collections import defaultdict
 from pathlib import Path
 import subprocess
 import sys
+from argparse import ArgumentParser
 
 from .lang import Lang
 from .lang_rust import RustLang
@@ -25,8 +26,7 @@ commands = get_exported_types(object, '.commands')
 
 def process_lang(lang_name: str) -> None:
 	lang_dir = Path('out', lang_name)
-	shutil.rmtree(lang_dir, ignore_errors = True)
-	lang_dir.mkdir(parents = True)
+	lang_dir.mkdir(parents = True, exist_ok = True)
 	shutil.copytree(Path('static', lang_name), lang_dir, dirs_exist_ok = True)
 
 	lang_types = get_exported_types(Lang, f'.lang_{lang_name}') # type: ignore
@@ -40,7 +40,7 @@ def process_lang(lang_name: str) -> None:
 		output_files[lang_dir / lang.type_file(command)].append(textwrap.dedent(lang.gen_type(t)))
 
 	for folder in set([p.parent for p in output_files.keys()]):
-		folder.mkdir(exist_ok = True)
+		folder.mkdir(parents = True, exist_ok = True)
 
 	for path, contents in output_files.items():
 		path.write_text('\n'.join(contents))
@@ -48,6 +48,13 @@ def process_lang(lang_name: str) -> None:
 	for args in lang.post_build():
 		subprocess.run(args, cwd = lang_dir, check = True)
 
-target_langs = sys.argv[1:]
-for lang in target_langs:
+parser = ArgumentParser()
+parser.add_argument('--clean', action = 'store_true')
+parser.add_argument('lang', nargs = '+')
+args = parser.parse_args()
+
+if args.clean:
+	shutil.rmtree('out', ignore_errors = True)
+
+for lang in args.lang:
 	process_lang(lang)
