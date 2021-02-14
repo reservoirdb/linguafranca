@@ -24,8 +24,15 @@ def get_exported_types(export_type: type[T], module_name: str) -> list[type[T]]:
 types = get_exported_types(object, '.types')
 commands = get_exported_types(object, '.commands')
 
-def process_lang(lang_name: str) -> None:
+def process_lang(lang_name: str, clean: bool) -> None:
 	lang_dir = Path('out', lang_name)
+	if clean:
+		for sub in lang_dir.iterdir():
+			if sub.is_file():
+				sub.unlink()
+			elif sub.is_dir() and sub != Path('.git'):
+				shutil.rmtree(sub)
+
 	lang_dir.mkdir(parents = True, exist_ok = True)
 	shutil.copytree(Path('static', lang_name), lang_dir, dirs_exist_ok = True)
 
@@ -53,8 +60,5 @@ parser.add_argument('--clean', action = 'store_true')
 parser.add_argument('lang', nargs = '+')
 args = parser.parse_args()
 
-if args.clean:
-	shutil.rmtree('out', ignore_errors = True)
-
 for lang in args.lang:
-	process_lang(lang)
+	process_lang(lang, args.clean)
