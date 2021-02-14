@@ -47,18 +47,18 @@ jobs:
 
           langs=(rust)
 
-          mkdir out
+          mkdir ci-out
 
           for lang in ${langs[@]}
           do
-            git clone git@github.com:reservoirdb/reservoirdb-protocol-$lang.git out/$lang
+            git clone git@github.com:reservoirdb/reservoirdb-protocol-$lang.git ci-out/$lang
           done
 
-          poetry run python -m linguafranca --clean ${langs[@]}
+          poetry run python -m linguafranca --outdir ci-out --clean ${langs[@]}
 
           for lang in ${langs[@]}
           do
-            pushd out/$lang
+            pushd ci-out/$lang
             git status
             git add --all
             git commit \

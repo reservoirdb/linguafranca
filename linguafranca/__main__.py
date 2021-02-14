@@ -24,8 +24,8 @@ def get_exported_types(export_type: type[T], module_name: str) -> list[type[T]]:
 types = get_exported_types(object, '.types')
 commands = get_exported_types(object, '.commands')
 
-def process_lang(lang_name: str, clean: bool) -> None:
-	lang_dir = Path('out', lang_name)
+def process_lang(lang_name: str, clean: bool, out_dir: str) -> None:
+	lang_dir = Path(out_dir, lang_name)
 	if clean:
 		for sub in lang_dir.iterdir():
 			if sub.is_file():
@@ -57,8 +57,9 @@ def process_lang(lang_name: str, clean: bool) -> None:
 
 parser = ArgumentParser()
 parser.add_argument('--clean', action = 'store_true')
+parser.add_argument('--outdir', type = str, default = 'out')
 parser.add_argument('lang', nargs = '+')
 args = parser.parse_args()
 
 for lang in args.lang:
-	process_lang(lang, args.clean)
+	process_lang(lang, args.clean, args.outdir)
