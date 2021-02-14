@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 
-from .types import *
+from .types_table import *
+from .types_user import *
 
 @dataclass
 class InsertData:

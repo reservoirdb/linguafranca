@@ -1,11 +1,10 @@
-from dataclasses import fields, Field
-from enum import Enum
+from dataclasses import fields, Field, is_dataclass
+from enum import Enum, IntFlag
 from typing import Any, get_origin, get_args
 from pathlib import Path
 import inspect
 
 from .lang import Lang
-from . import types
 
 _type_map: dict[type, str] = {
 	str: 'String',
@@ -18,13 +17,13 @@ class RustLang(Lang):
 		args = get_args(t)
 
 		if origin_type == list:
-			type_name = f'Vec<{self._field_type(args[0])}>'
-		elif t.__module__ == types.__name__:
-			type_name = f'crate::types::{t.__name__}'
+			return f'Vec<{self._field_type(args[0])}>'
+		elif origin_type == set:
+			return f'std::collections::HashSet<{self._field_type(args[0])}>'
+		elif is_dataclass(t):
+			return f'crate::types::{t.__name__}'
 		else:
-			type_name = _type_map[t]
-
-		return type_name
+			return _type_map[t]
 
 	def _field(self, field: Field[Any]) -> str:
 		return f'pub {field.name}: {self._field_type(field.type)},'
@@ -45,7 +44,17 @@ class RustLang(Lang):
 		'''
 
 	def gen_type(self, type_type: type) -> str:
-		if issubclass(type_type, Enum):
+		if issubclass(type_type, IntFlag):
+			variants = ' '.join([f'const {t.name} = {t.value};' for t in type_type])
+			return f'''
+			bitflags::bitflags! {{
+				#[derive(Default, serde::Serialize, serde::Deserialize)]
+				pub struct {type_type.__name__}: u32 {{
+					{variants}
+				}}
+			}}
+			'''
+		elif issubclass(type_type, Enum):
 			variants = ','.join([v.value for v in type_type])
 			return f'''
 			#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]

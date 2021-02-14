@@ -14,14 +14,14 @@ from .lang_rust import RustLang
 
 T = TypeVar('T', covariant = True)
 
-def get_exported_types(export_type: type[T], module_name: str) -> list[type[T]]:
-	module = importlib.import_module(module_name, package = __package__)
+def get_exported_types(export_type: type[T], *module_names: str) -> list[type[T]]:
+	modules = [importlib.import_module(m, package = __package__) for m in module_names]
 	return [
-		obj for obj in module.__dict__.values()
+		obj for module in modules for obj in module.__dict__.values()
 		if isinstance(obj, type) and obj.__module__ == module.__name__ and issubclass(obj, export_type)
 	]
 
-types = get_exported_types(object, '.types')
+types = get_exported_types(object, '.types_table', '.types_user')
 commands = get_exported_types(object, '.commands')
 
 def process_lang(lang_name: str, clean: bool, out_dir: str) -> None:
