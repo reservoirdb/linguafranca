@@ -42,6 +42,8 @@ jobs:
 
       - name: Push new versions
         run: |
+          shopt -s extglob
+
           git config --global user.email "github@reservoirdb.com"
           git config --global user.name "ReservoirDB Bot"
 
@@ -59,6 +61,8 @@ jobs:
           for lang in ${langs[@]}
           do
             cp -a out/$lang/. $gittempdir/$lang
+            rm -rf $gittempdir/$lang/!(.git)
+
             pushd $gittempdir/$lang
             git status
             git add --all
