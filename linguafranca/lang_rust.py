@@ -46,17 +46,21 @@ class RustLang(Lang):
 
 		if origin_type == list:
 			return f'Vec<{self._field_type(args[0])}>'
-		
+
 		if origin_type == set:
 			return f'std::collections::HashSet<{self._field_type(args[0])}>'
-		
+
+		if origin_type == dict:
+			assert args[0] == str
+			return f'std::collections::HashMap<{self._field_type(args[0])}, {self._field_type(args[1])}>'
+
 		if origin_type == Union:
 			if len(args) == 2 and args[1] == type(None):
 				return f'Option<{self._field_type(args[0])}>'
-		
+
 		if is_dataclass(t):
 			return f'crate::types::{t.__name__}'
-		
+
 		return _type_map[t]
 
 	def _field(self, field: Field[Any]) -> str:

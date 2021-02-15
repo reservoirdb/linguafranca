@@ -24,3 +24,9 @@ class RoleRef(str):
 @dataclass
 class User:
 	roles: set[RoleRef]
+
+@dataclass
+class Role:
+	database_permissions: DatabasePermissions
+	global_schema_permissions: SchemaPermissions
+	schema_permissions: dict[str, SchemaPermissions]
