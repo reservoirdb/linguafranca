@@ -23,3 +23,4 @@ class Column:
 @dataclass
 class Table:
 	columns: list[Column]
+	sort_key: str
