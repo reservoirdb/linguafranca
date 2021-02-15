@@ -23,4 +23,4 @@ class RoleRef(str):
 
 @dataclass
 class User:
-	roles: set[str]
+	roles: set[RoleRef]
