@@ -10,6 +10,7 @@ class TableRef:
 class ColumnType(str, Enum):
 	INT64 = 'Int64'
 	STRING = 'String'
+	TIMESTAMP = 'Timestamp'
 
 @dataclass
 class Column:
