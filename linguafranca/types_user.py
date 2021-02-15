@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 from enum import IntFlag
 
+from .types_schema import SchemaRef
+
 @dataclass
 class DatabasePermissions(IntFlag):
 	MANAGE_ROLES = 1 << 0
@@ -29,4 +31,4 @@ class User:
 class Role:
 	database_permissions: DatabasePermissions
 	global_schema_permissions: SchemaPermissions
-	schema_permissions: dict[str, SchemaPermissions]
+	schema_permissions: dict[SchemaRef, SchemaPermissions]

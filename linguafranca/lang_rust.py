@@ -51,7 +51,8 @@ class RustLang(Lang):
 			return f'std::collections::HashSet<{self._field_type(args[0])}>'
 
 		if origin_type == dict:
-			assert args[0] == str
+			# only strings or things that can be treated as strings in JSON
+			assert args[0] == str or inspect.getmro(args[0])[1] == str
 			return f'std::collections::HashMap<{self._field_type(args[0])}, {self._field_type(args[1])}>'
 
 		if origin_type == Union:
