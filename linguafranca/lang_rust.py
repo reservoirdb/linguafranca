@@ -11,6 +11,8 @@ _type_map: dict[type, str] = {
 	bool: 'bool',
 }
 
+_struct_enum_header = '#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]'
+
 class RustLang(Lang):
 	def _field_type(self, t: type) -> str:
 		origin_type = get_origin(t)
@@ -50,15 +52,20 @@ class RustLang(Lang):
 		elif issubclass(type_type, Enum):
 			variants = ','.join([v.value for v in type_type])
 			return f'''
-			#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+			{_struct_enum_header}
 			pub enum {type_type.__name__} {{
 				{variants}
 			}}
 			'''
+		elif issubclass(type_type, (str, )):
+			return f'''
+			{_struct_enum_header}
+			pub struct {type_type.__name__} (pub {self._field_type(inspect.getmro(type_type)[1])});
+			'''
 		else:
 			body = ' '.join([self._field(field) for field in fields(type_type)])
 			return f'''
-			#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+			{_struct_enum_header}
 			pub struct {type_type.__name__} {{
 				{body}
 			}}
@@ -66,6 +73,6 @@ class RustLang(Lang):
 
 	def post_build(self) -> list[list[str]]:
 		return [
-			['cargo', 'fmt', '--all'],
 			['cargo', 'check'],
+			['cargo', 'fmt', '--all'],
 		]
