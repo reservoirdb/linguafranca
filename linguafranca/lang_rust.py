@@ -28,20 +28,11 @@ class RustLang(Lang):
 	def _field(self, field: Field[Any]) -> str:
 		return f'pub {field.name}: {self._field_type(field.type)},'
 
-	def command_file(self, command_type: type) -> Path:
-		return Path('src', 'commands.rs')
+	def file_extension(self) -> str:
+		return '.rs'
 
-	def type_file(self, type_type: type) -> Path:
-		return Path('src', 'types.rs')
-
-	def gen_command(self, command_type: type) -> str:
-		body = ' '.join([self._field(field) for field in fields(command_type)])
-		return f'''
-		#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
-		pub struct {command_type.__name__} {{
-			{body}
-		}}
-		'''
+	def source_dir(self) -> str:
+		return 'src'
 
 	def gen_type(self, type_type: type) -> str:
 		if issubclass(type_type, IntFlag):

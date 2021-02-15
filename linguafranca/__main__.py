@@ -21,8 +21,10 @@ def get_exported_types(export_type: type[T], *module_names: str) -> list[type[T]
 		if isinstance(obj, type) and obj.__module__ == module.__name__ and issubclass(obj, export_type)
 	]
 
-types = get_exported_types(object, '.types_table', '.types_user')
-commands = get_exported_types(object, '.commands')
+target_types = {
+	'types': get_exported_types(object, '.types_table', '.types_user'),
+	'commands': get_exported_types(object, '.commands'),
+}
 
 def process_lang(lang_name: str, clean: bool, out_dir: str) -> None:
 	lang_dir = Path(out_dir, lang_name)
@@ -35,12 +37,11 @@ def process_lang(lang_name: str, clean: bool, out_dir: str) -> None:
 	lang_types = get_exported_types(Lang, f'.lang_{lang_name}') # type: ignore
 	lang = lang_types[0]()
 
-	output_files: dict[Path, list[str]] = defaultdict(list)
-	for command in commands:
-		output_files[lang_dir / lang.command_file(command)].append(textwrap.dedent(lang.gen_command(command)))
-
-	for t in types:
-		output_files[lang_dir / lang.type_file(command)].append(textwrap.dedent(lang.gen_type(t)))
+	output_files = {
+		lang_dir / lang.source_dir() / (filename + lang.file_extension()):
+		[textwrap.dedent(lang.gen_type(t)) for t in types]
+		for filename, types in target_types.items()
+	}
 
 	for folder in set([p.parent for p in output_files.keys()]):
 		folder.mkdir(parents = True, exist_ok = True)

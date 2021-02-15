@@ -3,15 +3,11 @@ from pathlib import Path
 
 class Lang(ABC):
 	@abstractmethod
-	def command_file(self, command_type: type) -> Path:
+	def file_extension(self) -> str:
 		...
 
 	@abstractmethod
-	def type_file(self, type_type: type) -> Path:
-		...
-
-	@abstractmethod
-	def gen_command(self, command_type: type) -> str:
+	def source_dir(self) -> str:
 		...
 
 	@abstractmethod
