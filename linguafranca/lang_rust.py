@@ -3,6 +3,7 @@ from enum import Enum, IntFlag
 from typing import Any, get_origin, get_args
 from pathlib import Path
 import inspect
+from collections.abc import Hashable
 
 from .lang import Lang
 
@@ -14,33 +15,26 @@ _type_map: dict[type, str] = {
 class RustLang(Lang):
 	def _derive_header(
 		self,
-		default_struct: bool = True,
-		serde: bool = True,
+		type_type: type,
+		standard_struct: bool = True,
 		default: bool = False,
 		hashable: bool = False,
 	) -> str:
-		derives = set()
+		derives = {
+			'serde::Serialize',
+			'serde::Deserialize',
+		}
 
-		if default_struct:
-			derives |= {
-				'Debug',
-				'Clone',
-				'PartialEq',
-			}
+		if standard_struct:
+			derives |= {'Debug', 'Clone', 'PartialEq'}
+
+		if issubclass(type_type, Hashable):
+			derives |= {'Eq', 'Hash'}
 
 		if default:
 			derives |= {
 				'Default',
 			}
-
-		if serde:
-			derives |= {
-				'serde::Serialize',
-				'serde::Deserialize',
-			}
-
-		if hashable:
-			derives |= {'Eq', 'Hash'}
 
 		# rustfmt can't keep sort for us because order is semantically useful
 		derive_body = ', '.join(sorted(derives))
@@ -73,7 +67,7 @@ class RustLang(Lang):
 			variants = ' '.join([f'const {t.name} = {t.value};' for t in type_type])
 			return f'''
 			bitflags::bitflags! {{
-				{self._derive_header(default = True, default_struct = False)}
+				{self._derive_header(type_type, default = True, standard_struct = False)}
 				pub struct {type_type.__name__}: u32 {{
 					const NONE = 0;
 					{variants}
@@ -84,20 +78,20 @@ class RustLang(Lang):
 		elif issubclass(type_type, Enum):
 			variants = ','.join([v.value for v in type_type])
 			return f'''
-			{self._derive_header()}
+			{self._derive_header(type_type)}
 			pub enum {type_type.__name__} {{
 				{variants}
 			}}
 			'''
 		elif issubclass(type_type, (str, )):
 			return f'''
-			{self._derive_header(hashable = True)}
+			{self._derive_header(type_type)}
 			pub struct {type_type.__name__}(pub {self._field_type(inspect.getmro(type_type)[1])});
 			'''
 		else:
 			body = ' '.join([self._field(field) for field in fields(type_type)])
 			return f'''
-			{self._derive_header()}
+			{self._derive_header(type_type)}
 			pub struct {type_type.__name__} {{
 				{body}
 			}}

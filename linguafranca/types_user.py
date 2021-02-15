@@ -13,11 +13,11 @@ class SchemaPermissions(IntFlag):
 	WRITE_TABLE = 1 << 2
 	READ_TABLE = 1 << 3
 
-@dataclass
+@dataclass(frozen = True)
 class UserRef(str):
 	pass
 
-@dataclass
+@dataclass(frozen = True)
 class RoleRef(str):
 	pass
 

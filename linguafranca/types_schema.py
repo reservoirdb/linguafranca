@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from enum import IntFlag
 
-@dataclass
+@dataclass(frozen = True)
 class SchemaRef(str):
 	pass
 
