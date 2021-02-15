@@ -23,4 +23,4 @@ class DeleteTable:
 @dataclass
 class InsertData:
 	table: TableRef
-	name: str
+	data_ref: str
