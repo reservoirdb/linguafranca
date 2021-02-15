@@ -14,17 +14,25 @@ from .lang_rust import RustLang
 
 T = TypeVar('T', covariant = True)
 
-def get_exported_types(export_type: type[T], *module_names: str) -> list[type[T]]:
+def get_exported_types(export_type: type[T], module_names: list[str]) -> list[type[T]]:
 	modules = [importlib.import_module(m, package = __package__) for m in module_names]
 	return [
 		obj for module in modules for obj in module.__dict__.values()
 		if isinstance(obj, type) and obj.__module__ == module.__name__ and issubclass(obj, export_type)
 	]
 
-target_types = {
-	'types': get_exported_types(object, '.types_table', '.types_user'),
-	'commands': get_exported_types(object, '.commands'),
-}
+domains = [
+	'table',
+	'schema',
+	'user',
+]
+
+kinds = [
+	'commands',
+	'types',
+]
+
+target_types = {kind: get_exported_types(object, [f'.{kind}_{d}' for d in domains]) for kind in kinds}
 
 def process_lang(lang_name: str, clean: bool, out_dir: str) -> None:
 	lang_dir = Path(out_dir, lang_name)
@@ -34,7 +42,7 @@ def process_lang(lang_name: str, clean: bool, out_dir: str) -> None:
 	lang_dir.mkdir(parents = True, exist_ok = True)
 	shutil.copytree(Path('static', lang_name), lang_dir, dirs_exist_ok = True)
 
-	lang_types = get_exported_types(Lang, f'.lang_{lang_name}') # type: ignore
+	lang_types = get_exported_types(Lang, [f'.lang_{lang_name}']) # type: ignore
 	lang = lang_types[0]()
 
 	output_files = {

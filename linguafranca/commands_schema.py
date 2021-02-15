@@ -1,9 +1,8 @@
 from dataclasses import dataclass
 
+from .types_schema import *
 from .types_table import *
-from .types_user import *
 
 @dataclass
-class InsertData:
-	table: TableRef
-	name: str
+class CreateSchema:
+	name: SchemaRef

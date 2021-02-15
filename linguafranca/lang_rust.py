@@ -60,7 +60,7 @@ class RustLang(Lang):
 		elif issubclass(type_type, (str, )):
 			return f'''
 			{_struct_enum_header}
-			pub struct {type_type.__name__} (pub {self._field_type(inspect.getmro(type_type)[1])});
+			pub struct {type_type.__name__}(pub {self._field_type(inspect.getmro(type_type)[1])});
 			'''
 		else:
 			body = ' '.join([self._field(field) for field in fields(type_type)])

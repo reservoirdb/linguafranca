@@ -14,12 +14,12 @@ class SchemaPermissions(IntFlag):
 	READ_TABLE = 1 << 3
 
 @dataclass
-class UserRef:
-	name: str
+class UserRef(str):
+	pass
 
 @dataclass
-class RoleRef:
-	name: str
+class RoleRef(str):
+	pass
 
 @dataclass
 class User:
