@@ -1,6 +1,6 @@
 from dataclasses import fields, Field, is_dataclass
 from enum import Enum, IntFlag
-from typing import Any, get_origin, get_args
+from typing import Any, get_origin, get_args, Union
 from pathlib import Path
 import inspect
 from collections.abc import Hashable
@@ -46,12 +46,18 @@ class RustLang(Lang):
 
 		if origin_type == list:
 			return f'Vec<{self._field_type(args[0])}>'
-		elif origin_type == set:
+		
+		if origin_type == set:
 			return f'std::collections::HashSet<{self._field_type(args[0])}>'
-		elif is_dataclass(t):
+		
+		if origin_type == Union:
+			if len(args) == 2 and args[1] == type(None):
+				return f'Option<{self._field_type(args[0])}>'
+		
+		if is_dataclass(t):
 			return f'crate::types::{t.__name__}'
-		else:
-			return _type_map[t]
+		
+		return _type_map[t]
 
 	def _field(self, field: Field[Any]) -> str:
 		return f'pub {field.name}: {self._field_type(field.type)},'

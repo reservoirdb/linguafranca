@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from enum import Enum
+from typing import Optional
 
 from .types_schema import *
 
@@ -23,4 +24,4 @@ class Column:
 @dataclass
 class Table:
 	columns: list[Column]
-	sort_key: str
+	sort_key: Optional[str]
