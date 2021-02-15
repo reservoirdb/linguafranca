@@ -1,9 +1,11 @@
 from dataclasses import dataclass
 from enum import Enum
 
+from .types_schema import *
+
 @dataclass(frozen = True)
 class TableRef:
-	schema: str
+	schema: SchemaRef
 	name: str
 
 @dataclass
