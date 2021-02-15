@@ -41,7 +41,9 @@ class RustLang(Lang):
 			bitflags::bitflags! {{
 				#[derive(Default, serde::Serialize, serde::Deserialize)]
 				pub struct {type_type.__name__}: u32 {{
+					const NONE = 0;
 					{variants}
+					const ALL = u32::MAX;
 				}}
 			}}
 			'''
