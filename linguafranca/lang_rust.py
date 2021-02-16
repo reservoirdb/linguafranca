@@ -1,6 +1,6 @@
 from dataclasses import fields, Field, is_dataclass
 from enum import Enum, IntFlag
-from typing import Any, get_origin, get_args, Union
+from typing import Any, get_origin, get_args, Union, Protocol, Optional
 from pathlib import Path
 import inspect
 from collections.abc import Hashable
@@ -26,10 +26,10 @@ class RustLang(Lang):
 		}
 
 		if standard_struct:
-			derives |= {'Debug', 'Clone', 'PartialEq'}
-
-		if issubclass(type_type, Hashable):
-			derives |= {'Eq', 'Hash'}
+			if type_type.__eq__ != object.__eq__: # type: ignore
+				derives |= {'Clone', 'PartialEq'}
+				if issubclass(type_type, Hashable):
+					derives |= {'Eq', 'Hash'}
 
 		if default:
 			derives |= {
@@ -60,7 +60,10 @@ class RustLang(Lang):
 				return f'Option<{self._field_type(args[0])}>'
 
 		if is_dataclass(t):
-			return f'crate::types::{t.__name__}'
+			return f'crate::{t.__name__}'
+
+		if self._is_protocol(t):
+			return f'Box<dyn crate::{t.__name__}>'
 
 		return _type_map[t]
 
@@ -73,7 +76,25 @@ class RustLang(Lang):
 	def source_dir(self) -> str:
 		return 'src'
 
+	def _first_mro_or_none(self, ty: type) -> Optional[type]:
+		mro = inspect.getmro(ty)
+		if len(mro) >= 2:
+			return mro[1]
+		return None
+
+	def _is_protocol(self, ty: type) -> bool:
+		return self._first_mro_or_none(ty) == Protocol # type: ignore
+
+	def _protocol_trait_impl(self, ty: type, trait_ty: type) -> str:
+		ret = f'impl crate::{trait_ty.__name__} for {ty.__name__} {{}}'
+		if getattr(ty, 'tagged'):
+			ret = '#[typetag::serde] ' + ret
+		return ret
+
 	def gen_type(self, type_type: type) -> str:
+		traits_to_impl = [base for base in inspect.getmro(type_type)[1:] if self._is_protocol(base)]
+		trait_impl_str = '\n'.join([self._protocol_trait_impl(type_type, t) for t in traits_to_impl])
+
 		if issubclass(type_type, IntFlag):
 			variants = ' '.join([f'const {t.name} = {t.value};' for t in type_type])
 			return f'''
@@ -93,11 +114,15 @@ class RustLang(Lang):
 			pub enum {type_type.__name__} {{
 				{variants}
 			}}
+
+			{trait_impl_str}
 			'''
 		elif issubclass(type_type, (str, )):
 			return f'''
 			{self._derive_header(type_type)}
 			pub struct {type_type.__name__}(pub {self._field_type(inspect.getmro(type_type)[1])});
+
+			{trait_impl_str}
 			'''
 		else:
 			body = ' '.join([self._field(field) for field in fields(type_type)])
@@ -106,6 +131,8 @@ class RustLang(Lang):
 			pub struct {type_type.__name__} {{
 				{body}
 			}}
+
+			{trait_impl_str}
 			'''
 
 	def post_build(self) -> list[list[str]]:
