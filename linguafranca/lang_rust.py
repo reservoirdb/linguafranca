@@ -86,7 +86,13 @@ class RustLang(Lang):
 		return self._first_mro_or_none(ty) == Protocol # type: ignore
 
 	def _protocol_trait_impl(self, ty: type, trait_ty: type) -> str:
-		ret = f'impl crate::{trait_ty.__name__} for {ty.__name__} {{}}'
+		ret = f'''
+		impl crate::{trait_ty.__name__} for {ty.__name__} {{
+			fn as_any(&self) -> &dyn std::any::Any {{
+				self
+			}}
+		}}
+		'''
 		if getattr(ty, 'tagged'):
 			ret = '#[typetag::serde] ' + ret
 		return ret
