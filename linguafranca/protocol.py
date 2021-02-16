@@ -8,5 +8,6 @@ class AuthLoginResponse:
 
 @dataclass
 class AuthLoginRequest:
+	account: str
 	user: UserRef
 	password: str
