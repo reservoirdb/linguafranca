@@ -3,6 +3,7 @@ from enum import Enum
 from typing import Optional
 
 from .types_schema import *
+from . import TxnResult
 
 @dataclass(frozen = True)
 class TableRef:
@@ -22,6 +23,6 @@ class Column:
 	nullable: bool
 
 @dataclass
-class Table:
+class Table(TxnResult):
 	columns: list[Column]
 	sort_key: Optional[str]

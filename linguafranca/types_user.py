@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from enum import IntFlag
 
 from .types_schema import SchemaRef
+from . import TxnResult
 
 @dataclass
 class DatabasePermissions(IntFlag):
@@ -24,11 +25,11 @@ class RoleRef(str):
 	pass
 
 @dataclass
-class User:
+class User(TxnResult):
 	roles: set[RoleRef]
 
 @dataclass
-class Role:
+class Role(TxnResult):
 	database_permissions: DatabasePermissions
 	global_schema_permissions: SchemaPermissions
 	schema_permissions: dict[SchemaRef, SchemaPermissions]
