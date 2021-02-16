@@ -27,7 +27,7 @@ class RustLang(Lang):
 
 		if standard_struct:
 			if type_type.__eq__ != object.__eq__: # type: ignore
-				derives |= {'Clone', 'PartialEq'}
+				derives |= {'Debug', 'Clone', 'PartialEq'}
 				if issubclass(type_type, Hashable):
 					derives |= {'Eq', 'Hash'}
 
