@@ -32,7 +32,8 @@ kinds = [
 	'types',
 ]
 
-target_types = {kind: get_exported_types(object, [f'.{kind}_{d}' for d in domains]) for kind in kinds}
+target_files = {'protocol': ['.protocol']} | {k: [f'.{k}_{d}' for d in domains] for k in kinds}
+target_types = {kind: get_exported_types(object, files) for kind, files in target_files.items()}
 
 def process_lang(lang_name: str, clean: bool, out_dir: str) -> None:
 	lang_dir = Path(out_dir, lang_name)
