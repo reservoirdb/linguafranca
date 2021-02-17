@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import Optional
 
 from .types_user import *
 from . import Command, TxnResult
@@ -19,7 +20,7 @@ class TxnRequest:
 
 @dataclass(eq = False)
 class TxnResponse:
-	results: list[TxnResult]
+	results: list[Optional[TxnResult]]
 
 @dataclass
 class QueryRequest:
