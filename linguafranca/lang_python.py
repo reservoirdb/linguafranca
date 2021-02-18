@@ -68,7 +68,6 @@ class PythonLang(Lang):
 			'''
 		elif issubclass(type_type, (str, )):
 			return f'''
-			@dataclass
 			class {type_type.__name__}({inspect.getmro(type_type)[1].__name__}):
 				pass
 			'''
