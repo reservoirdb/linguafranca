@@ -55,7 +55,7 @@ class PythonLang(Lang):
 
 	def gen_type(self, type_type: type) -> str:
 		if issubclass(type_type, IntFlag):
-			variants = '; '.join([f'{t.name} = \'{t.value}\'' for t in type_type])
+			variants = '; '.join([f'{t.name} = {t.value}' for t in type_type])
 			return f'''
 			@dataclass
 			class {type_type.__name__}(enum.IntFlag):
@@ -65,7 +65,7 @@ class PythonLang(Lang):
 			variants = '; '.join([f'{t.name} = \'{t.value}\'' for t in type_type])
 			return f'''
 			@dataclass
-			class {type_type.__name__}(enum.Enum):
+			class {type_type.__name__}(str, enum.Enum):
 				{variants}
 			'''
 		elif issubclass(type_type, (str, )):
