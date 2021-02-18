@@ -57,14 +57,12 @@ class PythonLang(Lang):
 		if issubclass(type_type, IntFlag):
 			variants = '; '.join([f'{t.name} = {t.value}' for t in type_type])
 			return f'''
-			@dataclass
 			class {type_type.__name__}(enum.IntFlag):
 				{variants}
 			'''
 		elif issubclass(type_type, Enum):
 			variants = '; '.join([f'{t.name} = \'{t.value}\'' for t in type_type])
 			return f'''
-			@dataclass
 			class {type_type.__name__}(str, enum.Enum):
 				{variants}
 			'''
