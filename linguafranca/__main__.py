@@ -46,17 +46,17 @@ def process_lang(lang_name: str, clean: bool, out_dir: str) -> None:
 	lang_types = get_exported_types(Lang, [f'.lang_{lang_name}']) # type: ignore
 	lang = lang_types[0]()
 
-	output_files = {
-		lang_dir / lang.source_dir() / (filename + lang.file_extension()):
-		[textwrap.dedent(lang.gen_type(t)) for t in types]
-		for filename, types in target_types.items()
-	}
+	output_files = defaultdict(list)
+
+	for filename, types in target_types.items():
+		full_path = lang_dir / lang.source_dir() / ((lang.filename() or filename) + lang.file_extension())
+		output_files[full_path].extend([textwrap.dedent(lang.gen_type(t)) for t in types])
 
 	for folder in set([p.parent for p in output_files.keys()]):
 		folder.mkdir(parents = True, exist_ok = True)
 
 	for path, contents in output_files.items():
-		path.write_text('\n'.join(contents))
+		path.write_text('\n'.join([textwrap.dedent(lang.file_header())] + contents))
 
 	for args in lang.post_build():
 		subprocess.run(args, cwd = lang_dir, check = True)
