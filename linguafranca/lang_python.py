@@ -54,20 +54,41 @@ class PythonLang(Lang):
 		return t.__name__
 
 	def gen_type(self, type_type: type) -> str:
-		traits_to_impl = [base for base in inspect.getmro(type_type)[1:] if self._is_protocol(base)]
-		class_fields = [f'{f.name}: {self._field_type(f.type)}' for f in fields(type_type)]
-		body = '; '.join(class_fields) if class_fields else 'pass'
-		inherits = '(' + ', '.join([t.__name__ for t in traits_to_impl]) + ')' if traits_to_impl else ''
-
-		return f'''
-		@dataclass
-		class {type_type.__name__}{inherits}:
-			{body}
-		'''
+		if issubclass(type_type, IntFlag):
+			variants = '; '.join([f'{t.name} = \'{t.value}\'' for t in type_type])
+			return f'''
+			@dataclass
+			class {type_type.__name__}(enum.IntFlag):
+				{variants}
+			'''
+		elif issubclass(type_type, Enum):
+			variants = '; '.join([f'{t.name} = \'{t.value}\'' for t in type_type])
+			return f'''
+			@dataclass
+			class {type_type.__name__}(enum.Enum):
+				{variants}
+			'''
+		elif issubclass(type_type, (str, )):
+			return f'''
+			@dataclass
+			class {type_type.__name__}({inspect.getmro(type_type)[1].__name__}):
+				pass
+			'''
+		else:
+			traits_to_impl = [base for base in inspect.getmro(type_type)[1:] if self._is_protocol(base)]
+			class_fields = [f'{f.name}: {self._field_type(f.type)}' for f in fields(type_type)]
+			body = '; '.join(class_fields) if class_fields else 'pass'
+			inherits = '(' + ', '.join([t.__name__ for t in traits_to_impl]) + ')' if traits_to_impl else ''
+			return f'''
+			@dataclass
+			class {type_type.__name__}{inherits}:
+				{body}
+			'''
 
 	def file_header(self) -> str:
 		return '''
 		import typing
+		import enum
 		from dataclasses import dataclass
 
 		from . import Command, TxnResult, TaggedCommand, TaggedTxnResult
