@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from enum import IntFlag
+from typing import Optional
 
 from .types_compute import ComputeClusterRef
 from .types_schema import SchemaRef
@@ -39,5 +40,5 @@ class Role(TxnResult):
 	database_permissions: DatabasePermissions
 	global_schema_permissions: SchemaPermissions
 	schema_permissions: dict[SchemaRef, SchemaPermissions]
-	global_compute_cluster_permissions: ComputeClusterPermissions
-	compute_cluster_permissions: dict[ComputeClusterRef, ComputeClusterPermissions]
+	global_compute_cluster_permissions: Optional[ComputeClusterPermissions]
+	compute_cluster_permissions: Optional[dict[ComputeClusterRef, ComputeClusterPermissions]]
