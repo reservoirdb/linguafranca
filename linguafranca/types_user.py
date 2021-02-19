@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from enum import IntFlag
 
+from .types_compute import ComputeClusterRef
 from .types_schema import SchemaRef
 from . import TxnResult
 
@@ -8,6 +9,7 @@ from . import TxnResult
 class DatabasePermissions(IntFlag):
 	MANAGE_ROLES = 1 << 0
 	MANAGE_SCHEMAS = 1 << 1
+	MANAGE_COMPUTE_CLUSTERS = 1 << 2
 
 @dataclass
 class SchemaPermissions(IntFlag):
@@ -15,6 +17,10 @@ class SchemaPermissions(IntFlag):
 	MANAGE_TABLES = 1 << 1
 	WRITE_TABLE = 1 << 2
 	READ_TABLE = 1 << 3
+
+@dataclass
+class ComputeClusterPermissions(IntFlag):
+	USE = 1 << 0
 
 @dataclass(frozen = True)
 class UserRef(str):
@@ -33,3 +39,5 @@ class Role(TxnResult):
 	database_permissions: DatabasePermissions
 	global_schema_permissions: SchemaPermissions
 	schema_permissions: dict[SchemaRef, SchemaPermissions]
+	global_compute_cluster_permissions: ComputeClusterPermissions
+	compute_cluster_permissions: dict[ComputeClusterRef, ComputeClusterPermissions]

@@ -25,6 +25,7 @@ domains = [
 	'table',
 	'schema',
 	'user',
+	'compute',
 ]
 
 kinds = [

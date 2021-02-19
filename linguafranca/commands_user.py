@@ -2,6 +2,7 @@ from dataclasses import dataclass
 
 from .types_schema import *
 from .types_user import *
+from .types_compute import *
 
 from . import Command
 
@@ -33,6 +34,17 @@ class GrantSchemaPermissions(Command):
 class GrantGlobalSchemaPermissions(Command):
 	role: RoleRef
 	permissions: SchemaPermissions
+
+@dataclass
+class GrantComputeClusterPermissions(Command):
+	role: RoleRef
+	compute_cluster: ComputeClusterRef
+	permissions: ComputeClusterPermissions
+
+@dataclass
+class GrantGlobalComputeClusterPermissions(Command):
+	role: RoleRef
+	permissions: ComputeClusterPermissions
 
 @dataclass
 class GrantDatabasePermissions(Command):
