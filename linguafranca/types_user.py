@@ -1,10 +1,10 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import IntFlag
 from typing import Optional
 
 from .types_compute import ComputeClusterRef
 from .types_schema import SchemaRef
-from . import TxnResult
+from . import TxnResult, lang_default
 
 @dataclass
 class DatabasePermissions(IntFlag):
@@ -40,5 +40,5 @@ class Role(TxnResult):
 	database_permissions: DatabasePermissions
 	global_schema_permissions: SchemaPermissions
 	schema_permissions: dict[SchemaRef, SchemaPermissions]
-	global_compute_cluster_permissions: Optional[ComputeClusterPermissions]
-	compute_cluster_permissions: Optional[dict[ComputeClusterRef, ComputeClusterPermissions]]
+	global_compute_cluster_permissions: ComputeClusterPermissions = field(default = lang_default)
+	compute_cluster_permissions: dict[ComputeClusterRef, ComputeClusterPermissions] = field(default = lang_default)

@@ -1,4 +1,4 @@
-from typing import Protocol, runtime_checkable
+from typing import Protocol, runtime_checkable, Any
 
 @runtime_checkable
 class Command(Protocol):
@@ -7,3 +7,5 @@ class Command(Protocol):
 @runtime_checkable
 class TxnResult(Protocol):
 	tagged: bool = True
+
+lang_default: Any = object()

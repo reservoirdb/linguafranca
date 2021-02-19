@@ -6,6 +6,7 @@ import inspect
 from collections.abc import Hashable
 
 from .lang import Lang
+from . import lang_default
 
 _type_map: dict[type, str] = {
 	str: 'String',
@@ -68,7 +69,12 @@ class RustLang(Lang):
 		return _type_map[t]
 
 	def _field(self, field: Field[Any]) -> str:
-		return f'pub {field.name}: {self._field_type(field.type)},'
+		field_header = []
+		if field.default == lang_default:
+			field_header.append('#[serde(default)]')
+
+		field_header_str = ' '.join(field_header)
+		return f'{field_header_str} pub {field.name}: {self._field_type(field.type)},'
 
 	def file_extension(self) -> str:
 		return '.rs'
