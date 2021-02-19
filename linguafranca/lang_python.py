@@ -94,4 +94,5 @@ class PythonLang(Lang):
 	def post_build(self) -> list[list[str]]:
 		return [
 			['mypy', '.'],
+			['yapf', '-ir', 'reservoirdb_protocol'],
 		]
