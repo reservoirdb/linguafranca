@@ -23,3 +23,5 @@
     fields:
       columns: vec<ColumnType>
       sort_key: option<string>
+  implements:
+  - TxnResult

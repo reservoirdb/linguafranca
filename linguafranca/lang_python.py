@@ -68,6 +68,13 @@ class PythonLang(Lang):
 			pass
 		'''
 
+	def make_interface(self, interface: InterfaceDef, type: TypeDefinition) -> str:
+		return f'''
+		@dataclasses.dataclass
+		class {type.name}(typing.Protocol):
+			pass
+		'''
+
 	def post_build(self) -> list[list[str]]:
 		return [
 			['mypy', '.'],

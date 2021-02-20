@@ -10,7 +10,7 @@ import yaml
 from dacite.core import from_dict
 from dacite.config import Config
 
-from .lang import Lang, TypeDefinition, StructDef, EnumDef, FlagsDef, WrapperDef
+from .lang import Lang, TypeDefinition, StructDef, EnumDef, FlagsDef, WrapperDef, InterfaceDef
 from .lang_rust import RustLang
 from .lang_python import PythonLang
 
@@ -40,6 +40,10 @@ def process_lang(
 			type_text = lang.make_flags(type_def.type, type_def)
 		elif isinstance(type_def.type, WrapperDef):
 			type_text = lang.make_wrapper(type_def.type, type_def)
+		elif isinstance(type_def.type, InterfaceDef):
+			type_text = lang.make_interface(type_def.type, type_def)
+		else:
+			raise Exception(f'unhandled instance type: {type(type_def.type)}')
 
 		output_files[full_path].append(textwrap.dedent(type_text))
 

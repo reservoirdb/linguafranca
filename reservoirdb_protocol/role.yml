@@ -30,6 +30,8 @@
   type:
     fields:
       roles: set<RoleRef>
+  implements:
+  - TxnResult
 
 - name: Role
   type:
@@ -39,3 +41,5 @@
       schema_permissions: map<SchemaRef, SchemaPermissions>
       global_compute_cluster_permissions: ComputeClusterPermissions
       compute_cluster_permissions: map<ComputeClusterRef, ComputeClusterPermissions>
+  implements:
+  - TxnResult

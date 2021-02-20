@@ -50,9 +50,15 @@ class FlagsDef:
 	flags: list[str]
 
 @dataclass
+class InterfaceDef:
+	type_name: str
+	content_name: str
+
+@dataclass
 class TypeDefinition:
 	name: str
-	type: Union[StructDef, WrapperDef, EnumDef, FlagsDef]
+	type: Union[StructDef, WrapperDef, EnumDef, FlagsDef, InterfaceDef]
+	implements: Optional[list[str]]
 
 @dataclass
 class TypeProperties:
@@ -93,6 +99,8 @@ class Lang(ABC):
 				return self.type_properties(t.type.wraps)
 			elif isinstance(t.type, (EnumDef, FlagsDef)):
 				return TypeProperties(hashable = True, equatable = True, cloneable = True)
+			elif isinstance(t.type, InterfaceDef):
+				return TypeProperties()
 
 	def _resolve_type(self, type_expr: str) -> ResolvedType:
 		if prim_resolved := _primitive_reverse_map.get(type_expr):
@@ -158,6 +166,10 @@ class Lang(ABC):
 
 	@abstractmethod
 	def make_flags(self, flags: FlagsDef, type: TypeDefinition) -> str:
+		...
+
+	@abstractmethod
+	def make_interface(self, interface: InterfaceDef, type: TypeDefinition) -> str:
 		...
 
 	@abstractmethod

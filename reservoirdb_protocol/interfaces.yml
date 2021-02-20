@@ -1,0 +1,4 @@
+- name: TxnResult
+  type:
+    type_name: type
+    content_name: data

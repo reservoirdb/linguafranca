@@ -49,6 +49,19 @@ class RustLang(Lang):
 		derive_body = ', '.join(sorted(derives))
 		return f'#[derive({derive_body})]'
 
+	def _trait_impl(self, type_name: str, interface_name: str) -> str:
+		return f'''
+		#[typetag::serde]
+		impl {interface_name} for {type_name} {{
+			fn as_any(&self) -> &dyn std::any::Any {{
+				self
+			}}
+		}}
+		'''
+
+	def _trait_impls(self, type: TypeDefinition) -> str:
+		return '\n'.join([self._trait_impl(type.name, t) for t in type.implements]) if type.implements else ''
+
 	def make_struct(self, struct: StructDef, type: TypeDefinition) -> str:
 		body = ' '.join([f'pub {n}: {self.type_str(f)},' for n, f in struct.fields.items()])
 
@@ -57,7 +70,7 @@ class RustLang(Lang):
 		pub struct {type.name} {{
 			{body}
 		}}
-		'''
+		''' + self._trait_impls(type)
 
 	def make_wrapper(self, wrapper: WrapperDef, type: TypeDefinition) -> str:
 		return f'''
@@ -86,6 +99,14 @@ class RustLang(Lang):
 				{body}
 				const ALL = u32::MAX;
 			}}
+		}}
+		'''
+
+	def make_interface(self, interface: InterfaceDef, type: TypeDefinition) -> str:
+		return f'''
+		#[typetag::serde(tag = "{interface.type_name}", content = "{interface.content_name}")]
+		pub trait {type.name} {{
+			fn as_any(&self) -> &dyn std::any::Any;
 		}}
 		'''
 

@@ -6,3 +6,5 @@
   type:
     fields:
       tables: set<string>
+  implements:
+  - TxnResult
