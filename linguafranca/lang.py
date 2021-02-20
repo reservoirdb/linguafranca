@@ -65,6 +65,7 @@ class TypeProperties:
 	hashable: bool = False
 	equatable: bool = False
 	cloneable: bool = False
+	debuggable: bool = False
 
 def _merge_type_props(*props: TypeProperties) -> TypeProperties:
 	ret = TypeProperties()
@@ -83,14 +84,14 @@ class Lang(ABC):
 			t = self._resolve_type(t)
 
 		if isinstance(t, PrimitiveType):
-			return TypeProperties(hashable = True, equatable = True, cloneable = True)
+			return TypeProperties(hashable = True, equatable = True, cloneable = True, debuggable = True)
 		elif isinstance(t, OptionType):
 			return self.type_properties(t.t)
 		elif isinstance(t, (SetType, VecType)):
-			list_props = TypeProperties(equatable = True, cloneable = True)
+			list_props = TypeProperties(equatable = True, cloneable = True, debuggable = True)
 			return _merge_type_props(list_props, self.type_properties(t.t))
 		elif isinstance(t, MapType):
-			map_props = TypeProperties(equatable = True, cloneable = True)
+			map_props = TypeProperties(equatable = True, cloneable = True, debuggable = True)
 			return _merge_type_props(map_props, self.type_properties(t.k), self.type_properties(t.v))
 		elif isinstance(t, TypeDefinition):
 			if isinstance(t.type, StructDef):
@@ -98,7 +99,7 @@ class Lang(ABC):
 			elif isinstance(t.type, WrapperDef):
 				return self.type_properties(t.type.wraps)
 			elif isinstance(t.type, (EnumDef, FlagsDef)):
-				return TypeProperties(hashable = True, equatable = True, cloneable = True)
+				return TypeProperties(hashable = True, equatable = True, cloneable = True, debuggable = True)
 			elif isinstance(t.type, InterfaceDef):
 				return TypeProperties()
 

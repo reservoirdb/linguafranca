@@ -1,0 +1,25 @@
+- name: AuthLoginRequest
+  type:
+    fields:
+      user: UserRef
+      password: string
+
+- name: AuthLoginResponse
+  type:
+    fields:
+      token: string
+
+- name: TxnRequest
+  type:
+    fields:
+      commands: vec<Command>
+
+- name: TxnResponse
+  type:
+    fields:
+      results: vec<TxnResult>
+
+- name: QueryRequest
+  type:
+    fields:
+      query: string

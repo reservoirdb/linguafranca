@@ -31,11 +31,16 @@ class RustLang(Lang):
 		return f'std::collections::HashSet<{self.type_str(t.t)}>'
 
 	def local_type(self, t: TypeDefinition) -> str:
+		if isinstance(t.type, InterfaceDef):
+			return f'Box<dyn {t.name}>'
 		return t.name
 
 	def _derive_header(self, t: TypeDefinition) -> str:
 		props = self.type_properties(t)
-		derives = {'Debug', 'serde::Serialize', 'serde::Deserialize'}
+		derives = {'serde::Serialize', 'serde::Deserialize'}
+
+		if props.debuggable:
+			derives |= {'Debug'}
 
 		if props.equatable:
 			derives |= {'PartialEq'}
@@ -105,7 +110,7 @@ class RustLang(Lang):
 	def make_interface(self, interface: InterfaceDef, type: TypeDefinition) -> str:
 		return f'''
 		#[typetag::serde(tag = "{interface.type_name}", content = "{interface.content_name}")]
-		pub trait {type.name} {{
+		pub trait {type.name}: 'static {{
 			fn as_any(&self) -> &dyn std::any::Any;
 		}}
 		'''
