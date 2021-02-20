@@ -34,6 +34,9 @@ class PythonLang(Lang):
 	def map_type(self, t: MapType) -> str:
 		return f'typing.Dict[{self.type_str(t.k)}, {self.type_str(t.v)}]'
 
+	def set_type(self, t: SetType) -> str:
+		return f'typing.Set[{self.type_str(t.t)}]'
+
 	def local_type(self, t: TypeDefinition) -> str:
 		return f'\'{t.name}\''
 

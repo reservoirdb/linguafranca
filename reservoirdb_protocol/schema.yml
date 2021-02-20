@@ -1,3 +1,8 @@
 - name: SchemaRef
   type:
     wraps: string
+
+- name: Schema
+  type:
+    fields:
+      tables: set<string>

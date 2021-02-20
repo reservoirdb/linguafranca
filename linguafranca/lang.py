@@ -23,11 +23,15 @@ class VecType:
 	t: 'ResolvedType'
 
 @dataclass
+class SetType:
+	t: 'ResolvedType'
+
+@dataclass
 class MapType:
 	k: 'ResolvedType'
 	v: 'ResolvedType'
 
-ResolvedType = Union[PrimitiveType, OptionType, VecType, MapType, 'TypeDefinition']
+ResolvedType = Union[PrimitiveType, OptionType, VecType, SetType, MapType, 'TypeDefinition']
 
 @dataclass
 class StructDef:
@@ -74,8 +78,11 @@ class Lang(ABC):
 
 		if isinstance(t, PrimitiveType):
 			return TypeProperties(hashable = True, equatable = True, cloneable = True)
-		elif isinstance(t, (OptionType, VecType)):
+		elif isinstance(t, OptionType):
 			return self.type_properties(t.t)
+		elif isinstance(t, (SetType, VecType)):
+			list_props = TypeProperties(equatable = True, cloneable = True)
+			return _merge_type_props(list_props, self.type_properties(t.t))
 		elif isinstance(t, MapType):
 			map_props = TypeProperties(equatable = True, cloneable = True)
 			return _merge_type_props(map_props, self.type_properties(t.k), self.type_properties(t.v))
@@ -99,6 +106,10 @@ class Lang(ABC):
 			return VecType(self._resolve_type(generic_args[0]))
 		if generic_type == 'option':
 			return OptionType(self._resolve_type(generic_args[0]))
+		if generic_type == 'set':
+			return SetType(self._resolve_type(generic_args[0]))
+		if generic_type == 'map':
+			return MapType(self._resolve_type(generic_args[0]), self._resolve_type(generic_args[1]))
 
 		raise Exception(f'failed to resolve type: {type_expr}')
 
@@ -114,6 +125,8 @@ class Lang(ABC):
 			return self.vec_type(t)
 		elif isinstance(t, MapType):
 			return self.map_type(t)
+		elif isinstance(t, SetType):
+			return self.set_type(t)
 		elif isinstance(t, TypeDefinition):
 			return self.local_type(t)
 
@@ -155,6 +168,10 @@ class Lang(ABC):
 
 	@abstractmethod
 	def vec_type(self, t: VecType) -> str:
+		...
+
+	@abstractmethod
+	def set_type(self, t: SetType) -> str:
 		...
 
 	@abstractmethod

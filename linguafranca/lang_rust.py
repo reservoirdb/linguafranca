@@ -27,6 +27,9 @@ class RustLang(Lang):
 	def map_type(self, t: MapType) -> str:
 		return f'std::collections::HashMap<{self.type_str(t.k)}, {self.type_str(t.v)}>'
 
+	def set_type(self, t: SetType) -> str:
+		return f'std::collections::HashSet<{self.type_str(t.t)}>'
+
 	def local_type(self, t: TypeDefinition) -> str:
 		return t.name
 
