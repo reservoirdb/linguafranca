@@ -21,7 +21,7 @@
 - name: Table
   type:
     fields:
-      columns: vec<ColumnType>
+      columns: vec<Column>
       sort_key: option<string>
   implements:
   - TxnResult
