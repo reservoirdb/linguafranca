@@ -4,3 +4,38 @@
     - MANAGE_ROLES
     - MANAGE_SCHEMAS
     - MANAGE_COMPUTE_CLUSTERS
+
+- name: SchemaPermissions
+  type:
+    flags:
+    - MANAGE_ACCESS
+    - MANAGE_TABLES
+    - WRITE_TABLE
+    - READ_TABLE
+
+- name: ComputeClusterPermissions
+  type:
+    flags:
+    - USE
+
+- name: UserRef
+  type:
+    wraps: string
+
+- name: RoleRef
+  type:
+    wraps: string
+
+- name: User
+  type:
+    fields:
+      roles: set<RoleRef>
+
+- name: Role
+  type:
+    fields:
+      database_permissions: DatabasePermissions
+      global_schema_permissions: SchemaPermissions
+      schema_permissions: map<SchemaRef, SchemaPermissions>
+      global_compute_cluster_permissions: ComputeClusterPermissions
+      compute_cluster_permissions: map<ComputeClusterRef, ComputeClusterPermissions>

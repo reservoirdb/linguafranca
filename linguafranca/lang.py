@@ -101,15 +101,17 @@ class Lang(ABC):
 		if local_resolved := self.types_by_name.get(type_expr):
 			return local_resolved
 
-		generic_type, generic_args = nestedExpr('<', '>').parseString(f'<{type_expr}>')[0]
-		if generic_type == 'vec':
-			return VecType(self._resolve_type(generic_args[0]))
-		if generic_type == 'option':
-			return OptionType(self._resolve_type(generic_args[0]))
-		if generic_type == 'set':
-			return SetType(self._resolve_type(generic_args[0]))
-		if generic_type == 'map':
-			return MapType(self._resolve_type(generic_args[0]), self._resolve_type(generic_args[1]))
+		if '<' in type_expr:
+			generic_type, generic_arg_strings = nestedExpr('<', '>').parseString(f'<{type_expr}>')[0]
+			generic_args = [self._resolve_type(a.removesuffix(',')) for a in generic_arg_strings]
+			if generic_type == 'vec':
+				return VecType(generic_args[0])
+			if generic_type == 'option':
+				return OptionType(generic_args[0])
+			if generic_type == 'set':
+				return SetType(generic_args[0])
+			if generic_type == 'map':
+				return MapType(generic_args[0], generic_args[1])
 
 		raise Exception(f'failed to resolve type: {type_expr}')
 

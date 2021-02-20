@@ -1,0 +1,7 @@
+- name: ComputeClusterRef
+  type:
+    wraps: string
+
+- name: ComputeCluster
+  type:
+    fields: {}
