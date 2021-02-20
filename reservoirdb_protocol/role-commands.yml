@@ -1,0 +1,70 @@
+- name: CreateUser
+  type:
+    fields:
+      user: UserRef
+  implements:
+  - Command
+
+- name: GetUser
+  type:
+    fields:
+      user: UserRef
+  implements:
+  - Command
+
+- name: AssignUserRoles
+  type:
+    fields:
+      user: UserRef
+      roles: vec<RoleRef>
+  implements:
+  - Command
+
+- name: CreateRole
+  type:
+    fields:
+      role: RoleRef
+  implements:
+  - Command
+
+- name: GrantSchemaPermissions
+  type:
+    fields:
+      role: RoleRef
+      schema: SchemaRef
+      permissions: SchemaPermissions
+  implements:
+  - Command
+
+- name: GrantGlobalSchemaPermissions
+  type:
+    fields:
+      role: RoleRef
+      permissions: SchemaPermissions
+  implements:
+  - Command
+
+- name: GrantComputeClusterPermissions
+  type:
+    fields:
+      role: RoleRef
+      compute_cluster: ComputeClusterRef
+      permissions: ComputeClusterPermissions
+  implements:
+  - Command
+
+- name: GrantGlobalComputeClusterPermissions
+  type:
+    fields:
+      role: RoleRef
+      permissions: ComputeClusterPermissions
+  implements:
+  - Command
+
+- name: GrantDatabasePermissions
+  type:
+    fields:
+      role: RoleRef
+      permissions: DatabasePermissions
+  implements:
+  - Command

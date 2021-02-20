@@ -1,0 +1,6 @@
+- name: CreateSchema
+  type:
+    fields:
+      table: SchemaRef
+  implements:
+  - Command

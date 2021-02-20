@@ -1,0 +1,13 @@
+- name: CreateComputeCluster
+  type:
+    fields:
+      name: ComputeClusterRef
+  implements:
+  - Command
+
+- name: DeleteComputeCluster
+  type:
+    fields:
+      name: ComputeClusterRef
+  implements:
+  - Command

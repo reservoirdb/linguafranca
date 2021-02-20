@@ -1,0 +1,37 @@
+- name: CreateTable
+  type:
+    fields:
+      table: TableRef
+      table_def: Table
+  implements:
+  - Command
+
+- name: GetTable
+  type:
+    fields:
+      table: TableRef
+  implements:
+  - Command
+
+- name: AlterTable
+  type:
+    fields:
+      table: TableRef
+      new_columns: vec<Column>
+  implements:
+  - Command
+
+- name: DeleteTable
+  type:
+    fields:
+      table: TableRef
+  implements:
+  - Command
+
+- name: InsertData
+  type:
+    fields:
+      table: TableRef
+      data_ref: string
+  implements:
+  - Command
