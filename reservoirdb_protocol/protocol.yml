@@ -1,6 +1,7 @@
 - name: AuthLoginRequest
   type:
     fields:
+      account: string
       user: UserRef
       password: string
 
