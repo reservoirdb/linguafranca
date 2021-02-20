@@ -2,6 +2,7 @@
   type:
     fields:
       user: UserRef
+      password: string
   implements:
   - Command
 
