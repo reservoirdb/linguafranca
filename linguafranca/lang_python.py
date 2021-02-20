@@ -19,6 +19,7 @@ class PythonLang(Lang):
 		return '''
 		import dataclasses
 		import typing
+		import typing_extensions
 		import enum
 		'''
 
@@ -75,7 +76,7 @@ class PythonLang(Lang):
 
 	def make_interface(self, interface: InterfaceDef, type: TypeDefinition) -> str:
 		return f'''
-		class {type.name}(typing.Protocol):
+		class {type.name}(typing_extensions.Protocol):
 			pass
 		'''
 
