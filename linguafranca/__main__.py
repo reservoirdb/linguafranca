@@ -71,7 +71,14 @@ parser.add_argument('sourcedir')
 parser.add_argument('lang', nargs = '+')
 args = parser.parse_args()
 
+type_order: dict[type, int] = {
+	InterfaceDef: 0,
+}
+
+max_type_index = max(type_order.values()) + 1
+
 all_types = load_types(Path(args.sourcedir))
+all_types.sort(key = lambda t: type_order.get(type(t.type), max_type_index))
 types_by_name = {t.name: t for t in all_types}
 
 langs = {
