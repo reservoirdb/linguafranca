@@ -9,10 +9,6 @@ include = [ "reservoirdb_protcol/py.typed" ]
 python = "^3.7"
 typing-extensions = "^3.7.4"
 
-[tool.poetry.dev-dependencies]
-mypy = "^0.800"
-yapf = "^0.30.0"
-
 [build-system]
 requires = [ "poetry-core >= 1.0.0" ]
 build-backend = "poetry.core.masonry.api"
