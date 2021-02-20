@@ -41,36 +41,40 @@ class PythonLang(Lang):
 		return f'\'{t.name}\''
 
 	def make_struct(self, struct: StructDef, type: TypeDefinition) -> str:
+		body = ';'.join([f'{n}: {self.type_str(f)}' for n, f in struct.fields.items()]) if struct.fields else 'pass'
+
+		implements = ','.join(type.implements) if type.implements else None
+		implements = f'({implements})' if implements else ''
+
 		return f'''
 		@dataclasses.dataclass
-		class {type.name}:
-			pass
+		class {type.name}{implements}:
+			{body}
 		'''
 
 	def make_wrapper(self, wrapper: WrapperDef, type: TypeDefinition) -> str:
 		return f'''
-		@dataclasses.dataclass
 		class {type.name}({self.type_str(wrapper.wraps)}):
 			pass
 		'''
 
 	def make_enum(self, enum: EnumDef, type: TypeDefinition) -> str:
+		body = '; '.join([f'{v.upper()} = \'{v}\'' for v in enum.variants])
 		return f'''
-		@dataclasses.dataclass
 		class {type.name}(str, enum.Enum):
-			pass
+			{body}
 		'''
 
 	def make_flags(self, flags: FlagsDef, type: TypeDefinition) -> str:
+		body = ' '.join([f'{f} = 1 << {i};' for i, f in enumerate(flags.flags)])
+
 		return f'''
-		@dataclasses.dataclass
 		class {type.name}(enum.IntFlag):
-			pass
+			{body}
 		'''
 
 	def make_interface(self, interface: InterfaceDef, type: TypeDefinition) -> str:
 		return f'''
-		@dataclasses.dataclass
 		class {type.name}(typing.Protocol):
 			pass
 		'''

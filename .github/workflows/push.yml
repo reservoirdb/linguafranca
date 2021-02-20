@@ -47,7 +47,7 @@ jobs:
           git config --global user.email "github@reservoirdb.com"
           git config --global user.name "ReservoirDB Bot"
 
-          langs=(rust)
+          langs=(rust python)
 
           gittempdir=$(mktemp -d)
 
