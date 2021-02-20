@@ -1,0 +1,25 @@
+- name: TableRef
+  type:
+    fields:
+      schema: SchemaRef
+      name: string
+
+- name: ColumnType
+  type:
+    variants:
+    - Int64
+    - String
+    - Timestamp
+
+- name: Column
+  type:
+    fields:
+      name: string
+      ty: ColumnType
+      nullable: bool
+
+- name: Table
+  type:
+    fields:
+      columns: vec<ColumnType>
+      sort_key: option<string>

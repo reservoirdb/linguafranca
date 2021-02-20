@@ -1,0 +1,3 @@
+- name: SchemaRef
+  type:
+    wraps: string

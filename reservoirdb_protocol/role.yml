@@ -1,0 +1,6 @@
+- name: DatabasePermissions
+  type:
+    flags:
+    - MANAGE_ROLES
+    - MANAGE_SCHEMAS
+    - MANAGE_COMPUTE_CLUSTERS

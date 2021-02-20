@@ -1,42 +1,25 @@
-from types import ModuleType
-from typing import TypeVar
-import importlib
 import textwrap
 import shutil
 from collections import defaultdict
 from pathlib import Path
 import subprocess
-import sys
 from argparse import ArgumentParser
+from enum import Enum
 
-from .lang import Lang
+import yaml
+from dacite.core import from_dict
+from dacite.config import Config
+
+from .lang import Lang, TypeDefinition, StructDef, EnumDef, FlagsDef, WrapperDef
 from .lang_rust import RustLang
+from .lang_python import PythonLang
 
-T = TypeVar('T', covariant = True)
-
-def get_exported_types(export_type: type[T], module_names: list[str]) -> list[type[T]]:
-	modules = [importlib.import_module(m, package = __package__) for m in module_names]
-	return [
-		obj for module in modules for obj in module.__dict__.values()
-		if isinstance(obj, type) and obj.__module__ == module.__name__ and issubclass(obj, export_type)
-	]
-
-domains = [
-	'table',
-	'schema',
-	'user',
-	'compute',
-]
-
-kinds = [
-	'commands',
-	'types',
-]
-
-target_files = {'protocol': ['.protocol']} | {k: [f'.{k}_{d}' for d in domains] for k in kinds}
-target_types = {kind: get_exported_types(object, files) for kind, files in target_files.items()}
-
-def process_lang(lang_name: str, clean: bool, out_dir: str) -> None:
+def process_lang(
+	lang: Lang,
+	type_defs: list[TypeDefinition],
+	clean: bool,
+	out_dir: str,
+) -> None:
 	lang_dir = Path(out_dir, lang_name)
 	if clean:
 		shutil.rmtree(lang_dir)
@@ -44,14 +27,21 @@ def process_lang(lang_name: str, clean: bool, out_dir: str) -> None:
 	lang_dir.mkdir(parents = True, exist_ok = True)
 	shutil.copytree(Path('static', lang_name), lang_dir, dirs_exist_ok = True)
 
-	lang_types = get_exported_types(Lang, [f'.lang_{lang_name}']) # type: ignore
-	lang = lang_types[0]()
-
 	output_files = defaultdict(list)
 
-	for filename, types in target_types.items():
-		full_path = lang_dir / lang.source_dir() / ((lang.filename() or filename) + lang.file_extension())
-		output_files[full_path].extend([textwrap.dedent(lang.gen_type(t)) for t in types])
+	for type_def in type_defs:
+		full_path = lang_dir / lang.source_dir() / ((lang.filename() or 'default') + lang.file_extension())
+
+		if isinstance(type_def.type, StructDef):
+			type_text = lang.make_struct(type_def.type, type_def)
+		elif isinstance(type_def.type, EnumDef):
+			type_text = lang.make_enum(type_def.type, type_def)
+		elif isinstance(type_def.type, FlagsDef):
+			type_text = lang.make_flags(type_def.type, type_def)
+		elif isinstance(type_def.type, WrapperDef):
+			type_text = lang.make_wrapper(type_def.type, type_def)
+
+		output_files[full_path].append(textwrap.dedent(type_text))
 
 	for folder in set([p.parent for p in output_files.keys()]):
 		folder.mkdir(parents = True, exist_ok = True)
@@ -62,11 +52,29 @@ def process_lang(lang_name: str, clean: bool, out_dir: str) -> None:
 	for args in lang.post_build():
 		subprocess.run(args, cwd = lang_dir, check = True)
 
+def load_types(dir: Path) -> list[TypeDefinition]:
+	ret = []
+	for file in sorted(dir.glob('*.yml')):
+		contents = yaml.safe_load(file.read_text())
+		ret += [from_dict(TypeDefinition, t) for t in contents]
+
+	return ret
+
 parser = ArgumentParser()
 parser.add_argument('--clean', action = 'store_true')
 parser.add_argument('--outdir', type = str, default = 'out')
+parser.add_argument('sourcedir')
 parser.add_argument('lang', nargs = '+')
 args = parser.parse_args()
 
-for lang in args.lang:
-	process_lang(lang, args.clean, args.outdir)
+all_types = load_types(Path(args.sourcedir))
+types_by_name = {t.name: t for t in all_types}
+
+langs = {
+	'rust': RustLang(types_by_name),
+	'python': PythonLang(types_by_name),
+}
+
+for lang_name in args.lang:
+	lang = langs[lang_name]
+	process_lang(lang, all_types, args.clean, args.outdir)
