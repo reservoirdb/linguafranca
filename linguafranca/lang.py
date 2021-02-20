@@ -5,7 +5,7 @@ from dataclasses import dataclass, replace, fields
 from enum import Enum
 from functools import reduce
 
-from pyparsing import nestedExpr
+from pyparsing import nestedExpr, ParseResults
 
 class PrimitiveType(Enum):
 	STRING = 'string'
@@ -103,6 +103,27 @@ class Lang(ABC):
 			elif isinstance(t.type, InterfaceDef):
 				return TypeProperties()
 
+	def _resolve_generic_type(self, type_expr: str) -> ResolvedType:
+		generic_type, generic_args_raw = nestedExpr('<', '>').parseString(f'<{type_expr}>')[0]
+		last_arg = generic_args_raw[-1]
+
+		if isinstance(last_arg, ParseResults):
+			body = ','.join(last_arg)
+			generic_args = [self._resolve_generic_type(f'{generic_args_raw[0]}<{body}>')]
+		else:
+			generic_args = [self._resolve_type(a.removesuffix(',')) for a in generic_args_raw]
+
+		if generic_type == 'vec':
+			return VecType(generic_args[0])
+		if generic_type == 'option':
+			return OptionType(generic_args[0])
+		if generic_type == 'set':
+			return SetType(generic_args[0])
+		if generic_type == 'map':
+			return MapType(generic_args[0], generic_args[1])
+
+		raise Exception(f'failed to resolve generic type: {type_expr}')
+
 	def _resolve_type(self, type_expr: str) -> ResolvedType:
 		if prim_resolved := _primitive_reverse_map.get(type_expr):
 			return prim_resolved
@@ -111,16 +132,7 @@ class Lang(ABC):
 			return local_resolved
 
 		if '<' in type_expr:
-			generic_type, generic_arg_strings = nestedExpr('<', '>').parseString(f'<{type_expr}>')[0]
-			generic_args = [self._resolve_type(a.removesuffix(',')) for a in generic_arg_strings]
-			if generic_type == 'vec':
-				return VecType(generic_args[0])
-			if generic_type == 'option':
-				return OptionType(generic_args[0])
-			if generic_type == 'set':
-				return SetType(generic_args[0])
-			if generic_type == 'map':
-				return MapType(generic_args[0], generic_args[1])
+			return self._resolve_generic_type(type_expr)
 
 		raise Exception(f'failed to resolve type: {type_expr}')
 
