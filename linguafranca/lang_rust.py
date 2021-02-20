@@ -67,8 +67,15 @@ class RustLang(Lang):
 	def _trait_impls(self, type: TypeDefinition) -> str:
 		return '\n'.join([self._trait_impl(type.name, t) for t in type.implements]) if type.implements else ''
 
+	def _field(self, name: str, field_type_expr: str, struct: StructDef) -> str:
+		prefix = ''
+		if not struct.required or (isinstance(struct.required, list) and name not in struct.required):
+			prefix += '#[serde(default)] '
+
+		return f'{prefix}pub {name}: {self.type_str(field_type_expr)},'
+
 	def make_struct(self, struct: StructDef, type: TypeDefinition) -> str:
-		body = ' '.join([f'pub {n}: {self.type_str(f)},' for n, f in struct.fields.items()])
+		body = ' '.join([self._field(n, f, struct) for n, f in struct.fields.items()])
 
 		return f'''
 		{self._derive_header(type)}

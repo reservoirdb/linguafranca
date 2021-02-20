@@ -3,6 +3,9 @@
     fields:
       table: TableRef
       table_def: Table
+    required:
+    - table
+    - table_def
   implements:
   - Command
 
@@ -10,6 +13,8 @@
   type:
     fields:
       table: TableRef
+    required:
+    - table
   implements:
   - Command
 
@@ -18,6 +23,8 @@
     fields:
       table: TableRef
       new_columns: vec<Column>
+    required:
+    - table
   implements:
   - Command
 
@@ -25,6 +32,8 @@
   type:
     fields:
       table: TableRef
+    required:
+    - table
   implements:
   - Command
 
@@ -33,5 +42,8 @@
     fields:
       table: TableRef
       data_ref: string
+    required:
+    - table
+    - data_ref
   implements:
   - Command

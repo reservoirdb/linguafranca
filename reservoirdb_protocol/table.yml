@@ -3,6 +3,7 @@
     fields:
       schema: SchemaRef
       name: string
+    required: true
 
 - name: ColumnType
   type:
@@ -17,11 +18,13 @@
       name: string
       ty: ColumnType
       nullable: bool
+    required: true
 
 - name: Table
   type:
     fields:
       columns: vec<Column>
-      sort_key: option<string>
+      sort_key: option<string> 
+    required: true
   implements:
   - TxnResult

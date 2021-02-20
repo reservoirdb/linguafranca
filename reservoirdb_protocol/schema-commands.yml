@@ -2,5 +2,7 @@
   type:
     fields:
       name: SchemaRef
+    required:
+    - name
   implements:
   - Command

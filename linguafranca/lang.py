@@ -36,6 +36,7 @@ ResolvedType = Union[PrimitiveType, OptionType, VecType, SetType, MapType, 'Type
 @dataclass
 class StructDef:
 	fields: dict[str, str]
+	required: Optional[Union[bool, list[str]]]
 
 @dataclass
 class WrapperDef:

@@ -3,6 +3,9 @@
     fields:
       user: UserRef
       password: string
+    required:
+    - user
+    - password
   implements:
   - Command
 
@@ -10,6 +13,8 @@
   type:
     fields:
       user: UserRef
+    required:
+    - user
   implements:
   - Command
 
@@ -18,6 +23,9 @@
     fields:
       user: UserRef
       roles: vec<RoleRef>
+    required:
+    - user
+    - roles
   implements:
   - Command
 
@@ -25,6 +33,8 @@
   type:
     fields:
       role: RoleRef
+    required:
+    - role
   implements:
   - Command
 
@@ -34,6 +44,10 @@
       role: RoleRef
       schema: SchemaRef
       permissions: SchemaPermissions
+    required:
+    - role
+    - schema
+    - permissions
   implements:
   - Command
 
@@ -42,6 +56,9 @@
     fields:
       role: RoleRef
       permissions: SchemaPermissions
+    required:
+    - role
+    - permissions
   implements:
   - Command
 
@@ -51,6 +68,10 @@
       role: RoleRef
       compute_cluster: ComputeClusterRef
       permissions: ComputeClusterPermissions
+    required:
+    - role
+    - compute_cluster
+    - permissions
   implements:
   - Command
 
@@ -59,6 +80,9 @@
     fields:
       role: RoleRef
       permissions: ComputeClusterPermissions
+    required:
+    - role
+    - permissions
   implements:
   - Command
 
@@ -67,5 +91,8 @@
     fields:
       role: RoleRef
       permissions: DatabasePermissions
+    required:
+    - role
+    - permissions
   implements:
   - Command

@@ -4,23 +4,35 @@
       account: string
       user: UserRef
       password: string
+    required:
+    - account
+    - user
+    - password
 
 - name: AuthLoginResponse
   type:
     fields:
       token: string
+    required:
+    - account
 
 - name: TxnRequest
   type:
     fields:
       commands: vec<Command>
+    required:
+    - commands
 
 - name: TxnResponse
   type:
     fields:
       results: vec<option<TxnResult>>
+    required:
+    - results
 
 - name: QueryRequest
   type:
     fields:
       query: string
+    required:
+    - query
