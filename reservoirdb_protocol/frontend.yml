@@ -1,0 +1,15 @@
+- name: UIState
+  type:
+    fields:
+      tables: map<TableRef, Table>
+      schemas: map<SchemaRef, Schema>
+      users: map<UserRef, User>
+      roles: map<RoleRef, Role>
+  implements:
+  - TxnResult
+
+- name: UIGetState
+  type:
+    fields: {}
+  implements:
+  - Command
