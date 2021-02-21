@@ -121,7 +121,10 @@ class Lang(ABC):
 		if generic_type == 'set':
 			return SetType(generic_args[0])
 		if generic_type == 'map':
-			return MapType(generic_args[0], generic_args[1])
+			key_type = generic_args[0]
+			assert key_type == PrimitiveType.STRING or (isinstance(key_type, TypeDefinition) and isinstance(
+				key_type.type, WrapperDef) and self._resolve_type(key_type.type.wraps) == PrimitiveType.STRING)
+			return MapType(key_type, generic_args[1])
 
 		raise Exception(f'failed to resolve generic type: {type_expr}')
 
