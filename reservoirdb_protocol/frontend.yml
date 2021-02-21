@@ -1,7 +1,7 @@
 - name: UIState
   type:
     fields:
-      tables: map<TableRef, Table>
+      tables: map<string, Table>
       schemas: map<SchemaRef, Schema>
       users: map<UserRef, User>
       roles: map<RoleRef, Role>
