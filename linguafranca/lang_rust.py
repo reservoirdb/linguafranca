@@ -105,13 +105,15 @@ class RustLang(Lang):
 
 		return f'''
 		bitflags::bitflags! {{
-			#[derive(Default, serde::Deserialize, serde::Serialize)]
+			#[derive(Default)]
 			pub struct {type.name}: u32 {{
 				const NONE = 0;
 				{body}
 				const ALL = u32::MAX;
 			}}
 		}}
+
+		bitflags_serde_shim::impl_serde_for_bitflags!({type.name});
 		'''
 
 	def make_interface(self, interface: InterfaceDef, type: TypeDefinition) -> str:
