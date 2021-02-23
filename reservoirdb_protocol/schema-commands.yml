@@ -6,3 +6,12 @@
     - name
   implements:
   - Command
+
+- name: DeleteSchema
+  type:
+    fields:
+      name: SchemaRef
+    required:
+    - name
+  implements:
+  - Command

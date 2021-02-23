@@ -18,6 +18,15 @@
   implements:
   - Command
 
+- name: DeleteUser
+  type:
+    fields:
+      user: UserRef
+    required:
+    - user
+  implements:
+  - Command
+
 - name: AssignUserRoles
   type:
     fields:
@@ -30,6 +39,15 @@
   - Command
 
 - name: CreateRole
+  type:
+    fields:
+      role: RoleRef
+    required:
+    - role
+  implements:
+  - Command
+
+- name: DeleteRole
   type:
     fields:
       role: RoleRef
