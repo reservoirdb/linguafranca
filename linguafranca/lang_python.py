@@ -42,14 +42,12 @@ class PythonLang(Lang):
 		return f'\'{t.name}\''
 
 	def make_struct(self, struct: StructDef, type: TypeDefinition) -> str:
-		body = ';'.join([f'{n}: {self.type_str(f)}' for n, f in struct.fields.items()]) if struct.fields else 'pass'
-
-		implements = ','.join(type.implements) if type.implements else None
-		implements = f'({implements})' if implements else ''
+		body = ';'.join([f'{n}: {self.type_str(f)}' for n, f in struct.fields.items()])
 
 		return f'''
 		@dataclasses.dataclass
-		class {type.name}{implements}:
+		class {type.name}:
+			type: typing.Literal['{type.name}']
 			{body}
 		'''
 
@@ -75,9 +73,9 @@ class PythonLang(Lang):
 		'''
 
 	def make_interface(self, interface: InterfaceDef, type: TypeDefinition) -> str:
+		implementations = ', '.join([f'\'{t.name}\'' for t in self.implementations_of(type.name)])
 		return f'''
-		class {type.name}(typing_extensions.Protocol):
-			pass
+		{type.name} = typing.Union[{implementations}]
 		'''
 
 	def post_build(self) -> list[list[str]]:

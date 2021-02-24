@@ -1,9 +1,7 @@
 from abc import ABC, abstractmethod
-from pathlib import Path
-from typing import Optional, Literal, TypedDict, Union, NewType
-from dataclasses import dataclass, replace, fields
+from typing import Optional, Union, Literal
+from dataclasses import dataclass, fields
 from enum import Enum
-from functools import reduce
 
 from pyparsing import nestedExpr, ParseResults
 
@@ -52,8 +50,7 @@ class FlagsDef:
 
 @dataclass
 class InterfaceDef:
-	type_name: str
-	content_name: str
+	interface: Literal[True]
 
 @dataclass
 class TypeDefinition:
@@ -156,6 +153,9 @@ class Lang(ABC):
 			return self.set_type(t)
 		elif isinstance(t, TypeDefinition):
 			return self.local_type(t)
+
+	def implementations_of(self, interface_name: str) -> list[TypeDefinition]:
+		return [t for t in self.types_by_name.values() if t.implements and interface_name in t.implements]
 
 	@abstractmethod
 	def file_extension(self) -> str:

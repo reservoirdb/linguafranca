@@ -1,9 +1,7 @@
 - name: TxnResult
   type:
-    type_name: type
-    content_name: data
+    interface: true
 
 - name: Command
   type:
-    type_name: type
-    content_name: params
+    interface: true

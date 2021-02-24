@@ -118,7 +118,7 @@ class RustLang(Lang):
 
 	def make_interface(self, interface: InterfaceDef, type: TypeDefinition) -> str:
 		return f'''
-		#[typetag::serde(tag = "{interface.type_name}", content = "{interface.content_name}")]
+		#[typetag::serde(tag = "type")]
 		pub trait {type.name}: 'static {{
 			fn as_any(&self) -> &dyn std::any::Any;
 		}}
