@@ -13,6 +13,7 @@ from dacite.config import Config
 from .lang import Lang, TypeDefinition, StructDef, EnumDef, FlagsDef, WrapperDef, InterfaceDef
 from .lang_rust import RustLang
 from .lang_python import PythonLang
+from .lang_typescript import TypeScriptLang
 
 def process_lang(
 	lang: Lang,
@@ -54,7 +55,7 @@ def process_lang(
 		path.write_text('\n'.join([textwrap.dedent(lang.file_header())] + contents))
 
 	for args in lang.post_build():
-		subprocess.run(args, cwd = lang_dir, check = True)
+		subprocess.run(args, cwd = lang_dir, check = True, shell = True)
 
 def load_types(dir: Path) -> list[TypeDefinition]:
 	ret = []
@@ -84,6 +85,7 @@ types_by_name = {t.name: t for t in all_types}
 langs = {
 	'rust': RustLang(types_by_name),
 	'python': PythonLang(types_by_name),
+	'typescript': TypeScriptLang(types_by_name),
 }
 
 for lang_name in args.lang:
