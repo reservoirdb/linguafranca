@@ -60,7 +60,7 @@ class TypeScriptLang(Lang):
 
 	def make_wrapper(self, wrapper: WrapperDef, type: TypeDefinition) -> str:
 		return f'''
-		type {type.name} = {self.type_str(wrapper.wraps)}
+		export type {type.name} = {self.type_str(wrapper.wraps)}
 		'''
 
 	def make_enum(self, enum: EnumDef, type: TypeDefinition) -> str:
