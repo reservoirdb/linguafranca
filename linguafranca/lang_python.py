@@ -19,6 +19,7 @@ class PythonLang(Lang):
 		return '''
 		import dataclasses
 		import typing
+		import typing_extensions
 		import enum
 		'''
 
@@ -29,13 +30,13 @@ class PythonLang(Lang):
 		return f'typing.Optional[{self.type_str(t.t)}]'
 
 	def vec_type(self, t: VecType) -> str:
-		return f'list[{self.type_str(t.t)}]'
+		return f'typing.List[{self.type_str(t.t)}]'
 
 	def map_type(self, t: MapType) -> str:
-		return f'dict[{self.type_str(t.k)}, {self.type_str(t.v)}]'
+		return f'typing.Dict[{self.type_str(t.k)}, {self.type_str(t.v)}]'
 
 	def set_type(self, t: SetType) -> str:
-		return f'set[{self.type_str(t.t)}]'
+		return f'typing.Set[{self.type_str(t.t)}]'
 
 	def local_type(self, t: TypeDefinition) -> str:
 		return f'\'{t.name}\''
