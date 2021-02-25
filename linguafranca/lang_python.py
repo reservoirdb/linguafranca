@@ -47,8 +47,8 @@ class PythonLang(Lang):
 		return f'''
 		@dataclasses.dataclass
 		class {type.name}:
-			type: typing.Literal['{type.name}']
 			{body}
+			type: typing.Literal['{type.name}'] = '{type.name}'
 		'''
 
 	def make_wrapper(self, wrapper: WrapperDef, type: TypeDefinition) -> str:
@@ -73,7 +73,7 @@ class PythonLang(Lang):
 		'''
 
 	def make_interface(self, interface: InterfaceDef, type: TypeDefinition) -> str:
-		implementations = ', '.join([f'\'{t.name}\'' for t in self.implementations_of(type.name)])
+		implementations = ', '.join([t.name for t in self.implementations_of(type.name)])
 		return f'''
 		{type.name} = typing.Union[{implementations}]
 		'''
