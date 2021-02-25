@@ -40,6 +40,11 @@ jobs:
           toolchain: stable
           components: rustfmt
 
+      - name: Install Node toolchain
+        uses: actions/setup-node@v2
+        with:
+          node-version: 14
+
       - name: Push new versions
         run: |
           shopt -s extglob
