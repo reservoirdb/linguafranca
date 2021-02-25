@@ -55,7 +55,7 @@ def process_lang(
 		path.write_text('\n'.join([textwrap.dedent(lang.file_header())] + contents))
 
 	for args in lang.post_build():
-		subprocess.run(args, cwd = lang_dir, check = True, shell = True)
+		subprocess.run(args, cwd = lang_dir, check = True)
 
 def load_types(dir: Path) -> list[TypeDefinition]:
 	ret = []
