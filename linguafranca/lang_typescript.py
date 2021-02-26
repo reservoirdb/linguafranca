@@ -53,7 +53,6 @@ class TypeScriptLang(Lang):
 
 		return f'''
 		export interface {type.name} {{
-			type: '{type.name}',
 			{body}
 		}}
 		'''
@@ -82,7 +81,8 @@ class TypeScriptLang(Lang):
 		'''
 
 	def make_interface(self, interface: InterfaceDef, type: TypeDefinition) -> str:
-		implementations = ' | '.join([t.name for t in self.implementations_of(type.name)])
+		implementations = ' | '.join(
+			[f'({t.name} & {{ type: \'{t.name}\' }})' for t in self.implementations_of(type.name)])
 
 		return f'''
 		export type {type.name} = ({implementations})
