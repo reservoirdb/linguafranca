@@ -16,3 +16,7 @@ updates:
     directory: /static/python
     schedule:
       interval: daily
+  - package-ecosystem: npm
+    directory: /static/typescript
+    schedule:
+      interval: daily
