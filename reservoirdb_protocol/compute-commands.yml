@@ -15,3 +15,21 @@
     - name
   implements:
   - Command
+
+- name: ActivateComputeCluster
+  type:
+    fields:
+      name: ComputeClusterRef
+    required:
+    - name
+  implements:
+  - Command
+
+- name: DeactivateComputeCluster
+  type:
+    fields:
+      name: ComputeClusterRef
+    required:
+    - name
+  implements:
+  - Command

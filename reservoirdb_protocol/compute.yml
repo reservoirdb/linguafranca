@@ -2,8 +2,19 @@
   type:
     wraps: string
 
+- name: ComputeClusterState
+  type:
+    variants:
+    - Activating
+    - Active
+    - Deactivating
+    - Inactive
+
 - name: ComputeCluster
   type:
-    fields: {}
+    fields:
+      state: ComputeClusterState
+    required:
+    - state
   implements:
   - TxnResult
