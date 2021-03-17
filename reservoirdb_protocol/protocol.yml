@@ -20,6 +20,7 @@
   type:
     fields:
       commands: vec<Command>
+      run_on: option<ComputeClusterRef>
     required:
     - commands
 
@@ -34,5 +35,6 @@
   type:
     fields:
       query: string
+      run_on: option<ComputeClusterRef>
     required:
     - query
