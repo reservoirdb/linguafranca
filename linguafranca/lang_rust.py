@@ -119,7 +119,7 @@ class RustLang(Lang):
 	def make_interface(self, interface: InterfaceDef, type: TypeDefinition) -> str:
 		return f'''
 		#[typetag::serde(tag = "type")]
-		pub trait {type.name}: 'static {{
+		pub trait {type.name}: 'static + Send {{
 			fn as_any(&self) -> &dyn std::any::Any;
 		}}
 		'''
