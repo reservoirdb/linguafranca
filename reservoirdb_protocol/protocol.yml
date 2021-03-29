@@ -31,10 +31,17 @@
     required:
     - results
 
+- name: CatalogContext
+  type:
+    fields:
+      default_catalog: option<string>
+      default_schema: option<string>
+
 - name: QueryRequest
   type:
     fields:
       query: string
       run_on: option<ComputeClusterRef>
+      catalog_context: option<CatalogContext>
     required:
     - query
