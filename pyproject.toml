@@ -11,7 +11,7 @@ dacite = "^1.6.0"
 pyparsing = "^2.4.7"
 
 [tool.poetry.dev-dependencies]
-mypy = "^0.812"
+mypy = "^0.981"
 yapf = "^0.31.0"
 
 [build-system]
